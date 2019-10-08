@@ -1,0 +1,21 @@
+version: '2'
+
+services:
+  app:
+    image: micronaut-petclinic
+    ports:
+      - "8080:8080"
+    links:
+      - db      
+    environment:
+      JDBC_HOST: db
+      JDBC_PORT: 5432      
+  db:
+    image: postgres:11.2-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=petclinic
+      - POSTGRES_DB=petclinic
+    volumes:
+      - "./postgresql:/docker-entrypoint-initdb.d"

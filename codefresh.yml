@@ -18,14 +18,20 @@ steps:
     image: alpine/git:latest
     commands:
       - git pull
-  MyUnitTests:
-    title: Compile/Unit test
+  UnitTests:
+    title: Compile/Unit tests
     stage: test
     image: 'maven:3.5.2-jdk-8-alpine'
     commands:
       - mvn -Dmaven.repo.local=/codefresh/volume/m2_repository package
-  Integration:
-    title: Integration test
+  SonarQube:
+    title: SonarQube Analysis
+    stage: test
+    image: 'maven:3.5.2-jdk-8-alpine'
+    commands:
+      - mvn -Dmaven.repo.local=/codefresh/volume/m2_repository sonar:sonar
+  IntegrationTests:
+    title: Integration tests
     stage: integration
     image: maven:3.5.2-jdk-8-alpine
     commands:

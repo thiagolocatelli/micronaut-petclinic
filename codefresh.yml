@@ -12,6 +12,12 @@ steps:
     repo: 'thiagolocatelli/micronaut-petclinic'
     revision: master
     git: github
+  mail_pull:
+    title: Running git pull
+    stage: prepare
+    image: alpine/git:latest
+    commands:
+      - git pull
   MyUnitTests:
     title: Compile/Unit test
     stage: test
@@ -23,13 +29,12 @@ steps:
     stage: integration
     image: maven:3.5.2-jdk-8-alpine
     commands:
-     - mvn -Dmaven.repo.local=/codefresh/volume/m2_repository verify      
+      - mvn -Dmaven.repo.local=/codefresh/volume/m2_repository verify
   MyAppDockerImage:
     title: Building Docker Image
     type: build
     stage: build
-    image_name: micronaut-petclinic
+    image_name: thiagolocatelli/micronaut-petclinic
     working_directory: ./
-    tag: 'non-multi-stage'
+    tag: "${{CF_BRANCH_TAG_NORMALIZED}}"
     dockerfile: Dockerfile
-

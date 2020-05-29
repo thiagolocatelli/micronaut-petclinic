@@ -1,0 +1,46 @@
+version: '1.0'
+stages:
+  - prepare
+  - test
+  - integration
+  - build
+steps:
+  main_clone:
+    title: Cloning main repository...
+    stage: prepare
+    type: git-clone
+    repo: 'thiagolocatelli/micronaut-petclinic'
+    revision: master
+    git: github
+  mail_pull:
+    title: Running git pull
+    stage: prepare
+    image: alpine/git:latest
+    commands:
+      - git pull
+  UnitTests:
+    title: Compile/Unit tests
+    stage: test
+    image: 'maven:3.5.2-jdk-8-alpine'
+    commands:
+      - mvn -Dmaven.repo.local=/codefresh/volume/m2_repository package
+  SonarQube:
+    title: SonarQube Analysis
+    stage: test
+    image: 'maven:3.5.2-jdk-8-alpine'
+    commands:
+      - mvn -Dmaven.repo.local=/codefresh/volume/m2_repository sonar:sonar
+  IntegrationTests:
+    title: Integration tests
+    stage: integration
+    image: maven:3.5.2-jdk-8-alpine
+    commands:
+      - mvn -Dmaven.repo.local=/codefresh/volume/m2_repository verify
+  MyAppDockerImage:
+    title: Building Docker Image
+    type: build
+    stage: build
+    image_name: thiagolocatelli/micronaut-petclinic
+    working_directory: ./
+    tag: "${{CF_BRANCH_TAG_NORMALIZED}}"
+    dockerfile: Dockerfile
